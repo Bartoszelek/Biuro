@@ -1,0 +1,15 @@
+{
+  "name": "biuro-web",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "node build.mjs" },
+  "dependencies": {
+    "@univerjs/presets": "latest",
+    "@univerjs/preset-sheets-core": "latest",
+    "exceljs": "^4.4.0",
+    "xlsx": "^0.18.5",
+    "jszip": "^3.10.1",
+    "superdoc": "latest"
+  },
+  "devDependencies": { "esbuild": "^0.24.0" }
+}

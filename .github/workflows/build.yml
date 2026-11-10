@@ -1,0 +1,46 @@
+name: Build APK
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Zbuduj edytory (Univer, SuperDoc)
+        working-directory: web
+        run: |
+          npm install --no-audit --no-fund
+          npm ls @univerjs/presets superdoc exceljs || true
+          node build.mjs
+          ls -la ../app/src/main/assets/www
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.10.2
+      - name: Build debug APK
+        run: gradle assembleDebug || (sleep 30 && gradle assembleDebug --refresh-dependencies)
+      - name: Prepare APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk biuro.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Biuro-apk
+          path: biuro.apk
+      - name: Publish release (aktualizacje w aplikacji)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Biuro 1.${{ github.run_number }}
+          files: biuro.apk
+          make_latest: true
